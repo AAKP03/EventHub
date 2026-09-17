@@ -5,6 +5,7 @@ export default function MainLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="edit-profile" />
+      <Stack.Screen name="event-detail" />
     </Stack>
   );
 }
