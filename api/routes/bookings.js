@@ -185,4 +185,29 @@ router.delete("/:bookingId", async (req, res) => {
   }
 });
 
+// Get all bookings for an event
+router.get("/event/:eventId", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const snapshot = await db
+      .collection("bookings")
+      .where("eventId", "==", eventId)
+      .get();
+
+    const bookings = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.json(bookings);
+  } catch (error) {
+    console.error("Get event bookings error:", error);
+
+    res.status(500).json({
+      message: "Failed to get event bookings",
+    });
+  }
+});
+
 module.exports = router;

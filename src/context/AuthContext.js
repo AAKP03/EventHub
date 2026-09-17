@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  async function signUp({ name, email, password, phone }) {
+  async function signUp({ name, email, password, phone, role }) {
     const credential = await createUserWithEmailAndPassword(
       auth,
       email.trim(),
@@ -84,7 +84,7 @@ export function AuthProvider({ children }) {
       name: name.trim(),
       email: email.trim(),
       phone: phone ? phone.trim() : "",
-      role: "attendee",
+      role: role || "attendee",
       createdAt: serverTimestamp(),
     };
 

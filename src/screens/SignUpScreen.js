@@ -1,7 +1,4 @@
 // src/screens/SignUpScreen.js
-//
-// "Create an account" requirement.
-// Docs: https://reactnative.dev/docs/handling-text-input
 
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
@@ -36,14 +33,19 @@ export default function SignUpScreen() {
     password: "",
     confirmPassword: "",
   });
+
+  const [role, setRole] = useState("attendee");
+
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [authError, setAuthError] = useState("");
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
-    // Clear that field's error as soon as the user edits it again
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
+
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: null }));
+    }
   }
 
   async function handleSubmit() {
@@ -66,10 +68,12 @@ export default function SignUpScreen() {
     }
 
     setSubmitting(true);
+
     try {
-      await signUp(form);
-      // onAuthStateChanged in AuthContext will pick up the new session;
-      // the root navigator (App.js) swaps to the authenticated stack automatically.
+      await signUp({
+        ...form,
+        role,
+      });
     } catch (err) {
       setAuthError(mapFirebaseError(err.code));
     } finally {
@@ -88,6 +92,7 @@ export default function SignUpScreen() {
         error={errors.name}
         autoCapitalize="words"
       />
+
       <Field
         label="Email"
         value={form.email}
@@ -96,6 +101,7 @@ export default function SignUpScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
       <Field
         label="Phone (optional)"
         value={form.phone}
@@ -103,6 +109,7 @@ export default function SignUpScreen() {
         error={errors.phone}
         keyboardType="phone-pad"
       />
+
       <Field
         label="Password"
         value={form.password}
@@ -110,6 +117,7 @@ export default function SignUpScreen() {
         error={errors.password}
         secureTextEntry
       />
+
       <Field
         label="Confirm password"
         value={form.confirmPassword}
@@ -117,6 +125,44 @@ export default function SignUpScreen() {
         error={errors.confirmPassword}
         secureTextEntry
       />
+
+      <Text style={styles.roleLabel}>Account Type</Text>
+
+      <View style={styles.roleContainer}>
+        <TouchableOpacity
+          style={[
+            styles.roleButton,
+            role === "attendee" && styles.selectedRole,
+          ]}
+          onPress={() => setRole("attendee")}
+        >
+          <Text
+            style={[
+              styles.roleButtonText,
+              role === "attendee" && styles.selectedRoleText,
+            ]}
+          >
+            Attendee
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.roleButton,
+            role === "organizer" && styles.selectedRole,
+          ]}
+          onPress={() => setRole("organizer")}
+        >
+          <Text
+            style={[
+              styles.roleButtonText,
+              role === "organizer" && styles.selectedRoleText,
+            ]}
+          >
+            Organizer
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       {authError ? <Text style={styles.authError}>{authError}</Text> : null}
 
@@ -139,42 +185,64 @@ export default function SignUpScreen() {
   );
 }
 
-// Small reusable labeled input + inline error message
 function Field({ label, error, ...inputProps }) {
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
+
       <TextInput
         style={[styles.input, error && styles.inputError]}
         {...inputProps}
       />
+
       {error ? <Text style={styles.fieldError}>{error}</Text> : null}
     </View>
   );
 }
 
-// Translates Firebase Auth error codes into user-friendly text.
-// Full code list: https://firebase.google.com/docs/auth/admin/errors
 function mapFirebaseError(code) {
   switch (code) {
     case "auth/email-already-in-use":
       return "An account with this email already exists.";
+
     case "auth/invalid-email":
       return "That email address looks invalid.";
+
     case "auth/weak-password":
       return "Password is too weak.";
+
     case "auth/network-request-failed":
       return "Network error. Check your connection and try again.";
+
     default:
       return "Something went wrong. Please try again.";
   }
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, flexGrow: 1, justifyContent: "center" },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 24 },
-  fieldGroup: { marginBottom: 14 },
-  label: { fontSize: 13, fontWeight: "600", marginBottom: 4, color: "#333" },
+  container: {
+    padding: 24,
+    flexGrow: 1,
+    justifyContent: "center",
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 24,
+  },
+
+  fieldGroup: {
+    marginBottom: 14,
+  },
+
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 4,
+    color: "#333",
+  },
+
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -183,9 +251,61 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 15,
   },
-  inputError: { borderColor: "#d33" },
-  fieldError: { color: "#d33", fontSize: 12, marginTop: 4 },
-  authError: { color: "#d33", marginBottom: 12, textAlign: "center" },
+
+  inputError: {
+    borderColor: "#d33",
+  },
+
+  fieldError: {
+    color: "#d33",
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  roleLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#333",
+  },
+
+  roleContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
+  },
+
+  roleButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+
+  selectedRole: {
+    backgroundColor: "#4f46e5",
+    borderColor: "#4f46e5",
+  },
+
+  roleButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#333",
+  },
+
+  selectedRoleText: {
+    color: "#fff",
+  },
+
+  authError: {
+    color: "#d33",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+
   button: {
     backgroundColor: "#4f46e5",
     borderRadius: 8,
@@ -193,6 +313,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  buttonText: { color: "#fff", fontWeight: "700", fontSize: 15 },
-  link: { color: "#4f46e5", textAlign: "center", marginTop: 16 },
+
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+
+  link: {
+    color: "#4f46e5",
+    textAlign: "center",
+    marginTop: 16,
+  },
 });

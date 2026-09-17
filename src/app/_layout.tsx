@@ -1,13 +1,31 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
+import { useEffect } from "react";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 
 function RootNavigator() {
-  const { user, initializing } = useAuth();
+  const { user, profile, initializing } = useAuth();
+  const router = useRouter();
 
-  if (initializing) {
+  useEffect(() => {
+    if (!initializing && user && profile) {
+      if (profile.role === "organizer") {
+        router.replace("/organizer");
+      } else {
+        router.replace("/");
+      }
+    }
+  }, [initializing, user, profile]);
+
+  if (initializing || (user && !profile)) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <ActivityIndicator size="large" />
       </View>
     );

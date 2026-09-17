@@ -92,12 +92,21 @@ export default function MainHome() {
       <View style={styles.header}>
         <Text style={styles.title}>Discover Events</Text>
 
-        <TouchableOpacity
-          style={styles.bookingsButton}
-          onPress={() => router.push("/my-bookings")}
-        >
-          <Text style={styles.bookingsButtonText}>My Bookings</Text>
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push("/my-bookings")}
+          >
+            <Text style={styles.headerButtonText}>My Bookings</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push("/profile")}
+          >
+            <Text style={styles.headerButtonText}>Profile</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TextInput
@@ -143,7 +152,13 @@ export default function MainHome() {
               })
             }
           >
-            <Image source={{ uri: item.image }} style={styles.image} />
+            {item.image ? (
+              <Image source={{ uri: item.image }} style={styles.image} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Text style={styles.imagePlaceholderText}>No Image</Text>
+              </View>
+            )}
 
             <View style={styles.cardContent}>
               <Text style={styles.eventName}>{item.name}</Text>
@@ -201,16 +216,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  bookingsButton: {
+  headerButtons: {
+    flexDirection: "row",
+    gap: 8,
+  },
+
+  headerButton: {
     backgroundColor: "#000",
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 10,
   },
 
-  bookingsButtonText: {
+  headerButtonText: {
     color: "white",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
   },
 
@@ -305,5 +325,18 @@ const styles = StyleSheet.create({
 
   emptyText: {
     fontSize: 16,
+  },
+
+  imagePlaceholder: {
+    width: "100%",
+    height: 180,
+    backgroundColor: "#e0e0e0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  imagePlaceholderText: {
+    fontSize: 16,
+    color: "#666",
   },
 });
