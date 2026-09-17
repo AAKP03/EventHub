@@ -54,3 +54,88 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+# Updating EventHub for Expo Router
+
+Your project uses file-based routing, so here's exactly what changes from
+the plan I gave earlier.
+
+## 1. Delete two files (Expo's tutorial placeholders — not needed)
+
+In VS Code's Explorer, right-click and delete:
+
+- `src/app/index.tsx`
+- `src/app/explore.tsx`
+
+(You can leave `src/components/ui/*` alone — those become unused but
+harmless. Delete them later if you want a cleaner project.)
+
+## 2. Files you already have from before — no changes needed
+
+- `src/config/firebase.js`
+- `src/utils/validation.js`
+- `src/context/AuthContext.js`
+
+## 3. Replace these existing files with the new versions in this folder
+
+- `src/app/_layout.tsx` — **overwrite** its content with the new version here
+- `src/screens/LoginScreen.js` — **overwrite**
+- `src/screens/SignUpScreen.js` — **overwrite**
+- `src/screens/ProfileScreen.js` — **overwrite**
+- `src/screens/EditProfileScreen.js` — **overwrite**
+
+## 4. Create these brand new files and folders
+
+Right-click `src/app` → New Folder → name it exactly `(auth)` (with the
+parentheses). Inside it, create:
+
+- `_layout.tsx`
+- `login.tsx`
+- `sign-up.tsx`
+
+Right-click `src/app` → New Folder → name it exactly `(main)` (with the
+parentheses). Inside it, create:
+
+- `_layout.tsx`
+- `index.tsx`
+- `edit-profile.tsx`
+
+Copy each file's content from this folder into the matching new file.
+
+## 5. Your final src/app structure should look like this
+
+```
+src/app/
+├── _layout.tsx
+├── (auth)/
+│   ├── _layout.tsx
+│   ├── login.tsx
+│   └── sign-up.tsx
+└── (main)/
+    ├── _layout.tsx
+    ├── index.tsx
+    └── edit-profile.tsx
+```
+
+## 6. Install Firebase (you may have already done this)
+
+In your terminal, inside the project folder:
+
+```bash
+npx expo install firebase @react-native-async-storage/async-storage
+```
+
+You do **not** need `@react-navigation/native` or `@react-navigation/native-stack`
+— Expo Router already includes routing, so skip that install command from
+the earlier instructions.
+
+## 7. Run it
+
+```bash
+npx expo start
+```
+
+You should land on the login screen. Sign up, and you should be
+automatically taken to the Profile screen — no manual navigation code
+makes that happen, Expo Router's `Stack.Protected` does it for you based
+on whether `user` exists in `AuthContext`.
