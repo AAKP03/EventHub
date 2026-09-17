@@ -158,10 +158,10 @@ export default function OrganizerScreen() {
 
         <View style={styles.headerButtons}>
           <TouchableOpacity
-            style={styles.profileButton}
+            style={styles.profileIcon}
             onPress={() => router.push("/profile")}
           >
-            <Text style={styles.profileButtonText}>Profile</Text>
+            <Text style={styles.profileIconText}>👤</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -219,17 +219,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  profileButton: {
-    backgroundColor: "#555",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 10,
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#eeeeee",
   },
 
-  profileButtonText: {
-    color: "white",
-    fontSize: 13,
-    fontWeight: "bold",
+  profileIconText: {
+    fontSize: 20,
   },
 
   addButton: {

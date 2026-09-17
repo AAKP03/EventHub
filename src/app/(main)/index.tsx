@@ -101,10 +101,10 @@ export default function MainHome() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.headerButton}
+            style={styles.profileIcon}
             onPress={() => router.push("/profile")}
           >
-            <Text style={styles.headerButtonText}>Profile</Text>
+            <Text style={styles.profileIconText}>👤</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -338,5 +338,18 @@ const styles = StyleSheet.create({
   imagePlaceholderText: {
     fontSize: 16,
     color: "#666",
+  },
+
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#eeeeee",
+  },
+
+  profileIconText: {
+    fontSize: 20,
   },
 });
