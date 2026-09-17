@@ -6,6 +6,7 @@ export default function MainLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="edit-profile" />
       <Stack.Screen name="event-detail" />
+      <Stack.Screen name="my-bookings" />
     </Stack>
   );
 }

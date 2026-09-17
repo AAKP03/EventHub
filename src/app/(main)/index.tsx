@@ -89,7 +89,16 @@ export default function MainHome() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Discover Events</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Discover Events</Text>
+
+        <TouchableOpacity
+          style={styles.bookingsButton}
+          onPress={() => router.push("/my-bookings")}
+        >
+          <Text style={styles.bookingsButtonText}>My Bookings</Text>
+        </TouchableOpacity>
+      </View>
 
       <TextInput
         style={styles.searchInput}
@@ -179,11 +188,30 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 20,
+    marginBottom: 15,
+  },
+
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginHorizontal: 20,
-    marginBottom: 15,
+  },
+
+  bookingsButton: {
+    backgroundColor: "#000",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+
+  bookingsButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
   },
 
   searchInput: {

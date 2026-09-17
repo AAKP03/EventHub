@@ -18,6 +18,7 @@ export default function BookingScreen() {
   const router = useRouter();
   const { eventId } = useLocalSearchParams();
   const { user } = useAuth();
+  console.log("CURRENT USER UID:", user?.uid);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
