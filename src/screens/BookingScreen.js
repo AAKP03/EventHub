@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -16,14 +17,19 @@ import { useAuth } from "../context/AuthContext";
 export default function BookingScreen() {
   const router = useRouter();
   const { eventId } = useLocalSearchParams();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [seats, setSeats] = useState("1");
+  const [bookingLoading, setBookingLoading] = useState(false);
 
   const handleBooking = async () => {
+    if (bookingLoading) {
+      return;
+    }
+
     if (!name.trim()) {
       Alert.alert("Validation Error", "Please enter your name.");
       return;
@@ -55,11 +61,17 @@ export default function BookingScreen() {
         {
           text: "Confirm",
           onPress: async () => {
+            if (bookingLoading) {
+              return;
+            }
+
             try {
               if (!user) {
                 Alert.alert("Error", "You must be logged in to book an event.");
                 return;
               }
+
+              setBookingLoading(true);
 
               const response = await fetch(`${API_BASE_URL}/api/bookings`, {
                 method: "POST",
@@ -99,6 +111,8 @@ export default function BookingScreen() {
                 "Booking Failed",
                 error.message || "Unable to complete the booking.",
               );
+            } finally {
+              setBookingLoading(false);
             }
           },
         },
@@ -147,8 +161,22 @@ export default function BookingScreen() {
           onChangeText={setSeats}
         />
 
-        <TouchableOpacity style={styles.confirmButton} onPress={handleBooking}>
-          <Text style={styles.confirmButtonText}>Confirm Booking</Text>
+        <TouchableOpacity
+          style={[
+            styles.confirmButton,
+            bookingLoading && styles.disabledButton,
+          ]}
+          onPress={handleBooking}
+          disabled={bookingLoading}
+        >
+          {bookingLoading ? (
+            <>
+              <ActivityIndicator color="white" />
+              <Text style={styles.confirmButtonText}>Confirming...</Text>
+            </>
+          ) : (
+            <Text style={styles.confirmButtonText}>Confirm Booking</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -192,13 +220,20 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 30,
     marginBottom: 30,
+    minHeight: 55,
+  },
+
+  disabledButton: {
+    opacity: 0.6,
   },
 
   confirmButtonText: {
     color: "white",
     fontSize: 17,
     fontWeight: "bold",
+    marginTop: 4,
   },
 });

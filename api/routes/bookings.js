@@ -15,56 +15,72 @@ router.post("/", async (req, res) => {
       });
     }
 
-    if (seats < 1) {
+    const numberOfSeats = Number(seats);
+
+    if (!Number.isInteger(numberOfSeats) || numberOfSeats < 1) {
       return res.status(400).json({
         message: "At least one seat must be booked",
       });
     }
 
-    // Get the event
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
+    const result = await db.runTransaction(async (transaction) => {
+      const eventRef = db.collection("events").doc(eventId);
+      const eventDoc = await transaction.get(eventRef);
 
-    if (!eventDoc.exists) {
+      if (!eventDoc.exists) {
+        throw new Error("EVENT_NOT_FOUND");
+      }
+
+      const event = eventDoc.data();
+
+      // Check availability inside the transaction
+      if (event.availableSeats < numberOfSeats) {
+        throw new Error("NOT_ENOUGH_SEATS");
+      }
+
+      // Create booking reference
+      const bookingRef = db.collection("bookings").doc();
+
+      // Create booking
+      transaction.set(bookingRef, {
+        eventId,
+        userId,
+        name,
+        email,
+        phone,
+        seats: numberOfSeats,
+        eventName: event.name,
+        price: event.price,
+        status: "Confirmed",
+        createdAt: new Date(),
+      });
+
+      // Update available seats
+      transaction.update(eventRef, {
+        availableSeats: event.availableSeats - numberOfSeats,
+      });
+
+      return bookingRef.id;
+    });
+
+    res.status(201).json({
+      message: "Booking confirmed",
+      bookingId: result,
+    });
+  } catch (error) {
+    console.error("Booking error:", error);
+
+    if (error.message === "EVENT_NOT_FOUND") {
       return res.status(404).json({
         message: "Event not found",
       });
     }
 
-    const event = eventDoc.data();
-
-    // Check availability
-    if (event.availableSeats < seats) {
+    if (error.message === "NOT_ENOUGH_SEATS") {
       return res.status(400).json({
         message: "Not enough seats available",
       });
     }
-
-    // Create booking
-    const bookingRef = await db.collection("bookings").add({
-      eventId,
-      userId,
-      name,
-      email,
-      phone,
-      seats: Number(seats),
-      eventName: event.name,
-      price: event.price,
-      status: "Confirmed",
-      createdAt: new Date(),
-    });
-
-    // Update available seats
-    await eventRef.update({
-      availableSeats: event.availableSeats - Number(seats),
-    });
-
-    res.status(201).json({
-      message: "Booking confirmed",
-      bookingId: bookingRef.id,
-    });
-  } catch (error) {
-    console.error("Booking error:", error);
 
     res.status(500).json({
       message: "Failed to create booking",
