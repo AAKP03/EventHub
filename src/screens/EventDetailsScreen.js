@@ -6,13 +6,15 @@ import {
   ActivityIndicator,
   Image,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
 
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { API_BASE_URL } from "../config/api";
 
 export default function EventDetailsScreen() {
   const { eventId } = useLocalSearchParams();
+  const router = useRouter();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -92,6 +94,18 @@ export default function EventDetailsScreen() {
           <Text style={styles.label}>Available Seats</Text>
           <Text style={styles.value}>{event.availableSeats}</Text>
         </View>
+
+        <TouchableOpacity
+          style={styles.bookButton}
+          onPress={() => {
+            router.push({
+              pathname: "/booking",
+              params: { eventId: event.id },
+            });
+          }}
+        >
+          <Text style={styles.bookButtonText}>Book Now</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -150,5 +164,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
+  },
+
+  bookButton: {
+    backgroundColor: "#000",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  bookButtonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "bold",
   },
 });

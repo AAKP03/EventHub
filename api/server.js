@@ -3,12 +3,14 @@ const cors = require("cors");
 
 const { db } = require("./firebaseAdmin");
 const eventsRouter = require("./routes/events");
+const bookingsRouter = require("./routes/bookings");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/events", eventsRouter);
+app.use("/api/bookings", bookingsRouter);
 
 app.get("/", (req, res) => {
   res.json({
